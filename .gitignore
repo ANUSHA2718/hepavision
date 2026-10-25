@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+venv/
+env/
+ENV/
+models/extracted_backup/
+.system_generated/

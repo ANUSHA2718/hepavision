@@ -1,0 +1,141 @@
+{% extends "_app_base.html" %}
+{% block title %}CT Analysis — HepaVision{% endblock %}
+{% block content %}
+
+<header class="topbar">
+  <div>
+    <h1 class="topbar-title">CT Analysis</h1>
+    <p class="topbar-sub">Upload an abdominal CT slice to run liver &amp; tumor segmentation</p>
+  </div>
+  <div class="topbar-meta">
+    <div class="meta-pill"><i class="bi bi-shield-check"></i><span>Research Use Only</span></div>
+  </div>
+</header>
+
+<div class="card upload-card glass">
+  <h2>Upload CT Scan</h2>
+  <p class="card-sub">Accepted formats: PNG, JPG, JPEG, BMP, TIFF &middot; Max 25&nbsp;MB</p>
+
+  <form id="uploadForm">
+    <div id="dropZone" class="drop-zone">
+      <i class="bi bi-file-earmark-medical drop-icon"></i>
+      <p class="drop-text">Drag &amp; drop CT image here, or click to browse</p>
+      <p class="drop-formats">PNG &middot; JPG &middot; JPEG &middot; BMP &middot; TIFF</p>
+      <input type="file" id="ctImageInput" name="ct_image" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff" hidden>
+    </div>
+
+    <div class="optional-row">
+      <label for="gtInput" class="optional-label">
+        <i class="bi bi-plus-circle"></i> Optional: upload ground-truth mask (for Dice score)
+      </label>
+      <input type="file" id="gtInput" name="ground_truth" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff" class="form-control-sm">
+    </div>
+
+    <div class="preview-row" id="previewRow" style="display:none;">
+      <img id="previewImg" alt="CT preview">
+      <div class="preview-meta">
+        <span id="previewName"></span>
+        <button type="button" id="clearBtn" class="btn-ghost-sm"><i class="bi bi-x-lg"></i> Remove</button>
+      </div>
+    </div>
+
+    <div class="pipeline-track" id="pipelineTrack">
+      <div class="pt-steps" id="ptSteps">
+        <div class="pt-step" data-step="0"><span class="pt-dot"><i class="bi bi-cpu"></i></span><span class="pt-label">Loading AI Models</span></div>
+        <div class="pt-connector"></div>
+        <div class="pt-step" data-step="1"><span class="pt-dot"><i class="bi bi-sliders"></i></span><span class="pt-label">Preprocessing CT Image</span></div>
+        <div class="pt-connector"></div>
+        <div class="pt-step" data-step="2"><span class="pt-dot"><i class="bi bi-bounding-box-circles"></i></span><span class="pt-label">Liver Segmentation</span></div>
+        <div class="pt-connector"></div>
+        <div class="pt-step" data-step="3"><span class="pt-dot"><i class="bi bi-search-heart"></i></span><span class="pt-label">Tumor Segmentation</span></div>
+        <div class="pt-connector"></div>
+        <div class="pt-step" data-step="4"><span class="pt-dot"><i class="bi bi-layers"></i></span><span class="pt-label">Overlay Generation</span></div>
+        <div class="pt-connector"></div>
+        <div class="pt-step" data-step="5"><span class="pt-dot"><i class="bi bi-file-earmark-pdf"></i></span><span class="pt-label">Preparing Report</span></div>
+      </div>
+    </div>
+
+    <button type="submit" id="analyzeBtn" class="btn btn-primary btn-full" style="margin-top:20px;" disabled>
+      <i class="bi bi-activity"></i> Run Analysis
+    </button>
+  </form>
+
+  <div id="errorBox" class="error-box" style="display:none;"></div>
+</div>
+
+<div id="resultsContent" style="display:none;">
+
+  <div class="results-header">
+    <div>
+      <h2 style="margin-bottom:2px;">Diagnostic Results</h2>
+      <span class="results-sub">Generated on <span id="resultTimestamp"></span></span>
+    </div>
+    <span id="cancerStatusBadge" class="status-badge"></span>
+  </div>
+
+  <div class="image-grid">
+    <div class="image-card glass">
+      <span class="image-card-label">Original CT</span>
+      <div class="image-frame"><img id="imgOriginal" alt="Original CT scan"></div>
+    </div>
+    <div class="image-card glass">
+      <span class="image-card-label">Liver Segmentation</span>
+      <div class="image-frame"><img id="imgLiver" alt="Liver segmentation"></div>
+    </div>
+    <div class="image-card glass">
+      <span class="image-card-label">Tumor Segmentation</span>
+      <div class="image-frame"><img id="imgTumor" alt="Tumor segmentation"></div>
+    </div>
+    <div class="image-card glass">
+      <span class="image-card-label">Overlay Result</span>
+      <div class="image-frame"><img id="imgOverlay" alt="Overlay result"></div>
+    </div>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="metric-card glass">
+      <span class="metric-label">Tumor Burden</span>
+      <span class="metric-value mono" id="metricBurden">0.00%</span>
+      <div class="gauge-track"><div class="gauge-fill" id="gaugeBurden"></div></div>
+    </div>
+    <div class="metric-card glass">
+      <span class="metric-label">Number of Lesions</span>
+      <span class="metric-value mono" id="metricLesions">0</span>
+    </div>
+    <div class="metric-card glass">
+      <span class="metric-label">Liver / Tumor Pixels</span>
+      <span class="metric-value mono small" id="metricPixels">&mdash;</span>
+    </div>
+    <div class="metric-card glass">
+      <span class="metric-label">Segmentation Status</span>
+      <span class="metric-value mono small" id="metricSegStatus">&mdash;</span>
+    </div>
+    <div class="metric-card glass">
+      <span class="metric-label">Processing Time</span>
+      <span class="metric-value mono small" id="metricProcTime">&mdash;</span>
+    </div>
+    <div class="metric-card glass">
+      <span class="metric-label">Model Version</span>
+      <span class="metric-value mono small" id="metricModelVersion">&mdash;</span>
+    </div>
+    <div class="metric-card glass">
+      <span class="metric-label">AI Model Status</span>
+      <span class="metric-value mono small" id="metricModelStatus">&mdash;</span>
+    </div>
+    <div class="metric-card glass">
+      <span class="metric-label">Dice Score</span>
+      <span class="metric-value mono" id="metricDice">N/A</span>
+      <span class="metric-footnote">Only computed if a ground-truth mask was provided</span>
+    </div>
+  </div>
+
+  <div class="report-row">
+    <a id="downloadReportBtn" href="#" class="btn btn-primary" target="_blank">
+      <i class="bi bi-download"></i> Download Full Report (PDF)
+    </a>
+    <a href="{{ url_for('report') }}" class="btn btn-ghost"><i class="bi bi-file-earmark-text"></i> View Full Report</a>
+    <button class="btn btn-ghost" id="newAnalysisBtn" type="button"><i class="bi bi-arrow-repeat"></i> New Analysis</button>
+  </div>
+</div>
+
+{% endblock %}

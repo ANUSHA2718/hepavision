@@ -1,0 +1,118 @@
+{% extends "_app_base.html" %}
+{% block title %}Dashboard — HepaVision{% endblock %}
+{% block content %}
+
+<header class="topbar">
+  <div>
+    <h1 class="topbar-title">Welcome back</h1>
+    <p class="topbar-sub">Modern Medical AI Dashboard &mdash; liver &amp; tumor segmentation console</p>
+  </div>
+  <div class="topbar-meta">
+    <div class="meta-pill"><i class="bi bi-calendar3"></i><span id="liveDate"></span></div>
+    <div class="meta-pill"><i class="bi bi-shield-check"></i><span>Research Use Only</span></div>
+  </div>
+</header>
+
+<div class="overview-grid">
+  <div class="card overview-card glass">
+    <div class="overview-icon {{ 'teal' if models_ready else 'amber' }}"><i class="bi bi-cpu"></i></div>
+    <div>
+      <span class="overview-label">Model Status</span>
+      <span class="overview-value">{{ 'Loaded Successfully' if models_ready else 'Not Loaded' }}</span>
+    </div>
+  </div>
+  <div class="card overview-card glass">
+    <div class="overview-icon blue"><i class="bi bi-droplet-half"></i></div>
+    <div>
+      <span class="overview-label">Pipeline</span>
+      <span class="overview-value">Liver U-Net &rarr; Tumor U-Net</span>
+    </div>
+  </div>
+  <div class="card overview-card glass">
+    <div class="overview-icon violet"><i class="bi bi-bar-chart-steps"></i></div>
+    <div>
+      <span class="overview-label">Outputs</span>
+      <span class="overview-value">Burden, Lesions, Pixels</span>
+    </div>
+  </div>
+  <div class="card overview-card glass">
+    <div class="overview-icon amber"><i class="bi bi-file-earmark-medical"></i></div>
+    <div>
+      <span class="overview-label">Report</span>
+      <span class="overview-value">Auto-generated PDF</span>
+    </div>
+  </div>
+</div>
+
+<div class="dash-grid">
+  <div class="card glass">
+    <h2>Quick Actions</h2>
+    <p>Start a new CT analysis or jump back into your most recent diagnostic report.</p>
+    <div class="action-grid">
+      <a href="{{ url_for('analysis') }}" class="action-tile">
+        <i class="bi bi-cloud-upload"></i>
+        <span class="at-title">Analyze New CT Scan</span>
+        <span class="at-sub">Upload &amp; run the segmentation pipeline</span>
+      </a>
+      <a href="{{ url_for('report') }}" class="action-tile">
+        <i class="bi bi-clock-history"></i>
+        <span class="at-title">Previous Reports</span>
+        <span class="at-sub">View your latest diagnostic report</span>
+      </a>
+      <a href="{{ url_for('report') }}" class="action-tile" id="downloadReportTile">
+        <i class="bi bi-download"></i>
+        <span class="at-title">Download Report</span>
+        <span class="at-sub">Get the PDF for your last analysis</span>
+      </a>
+      <a href="{{ url_for('about') }}" class="action-tile">
+        <i class="bi bi-info-circle"></i>
+        <span class="at-title">About HepaVision</span>
+        <span class="at-sub">Methodology &amp; research overview</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="card glass">
+    <h2>Recent Analyses</h2>
+    <div class="recent-list" id="recentList">
+      <div class="empty-mini">
+        <i class="bi bi-clipboard2-pulse"></i>
+        No analyses yet. Run your first CT scan to see it here.
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.getElementById('liveDate');
+  if (el) el.textContent = new Date().toLocaleDateString(undefined, { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+  renderRecentAnalyses();
+});
+
+function renderRecentAnalyses() {
+  const list = document.getElementById('recentList');
+  const history = JSON.parse(localStorage.getItem('hepavision_history') || '[]');
+  if (!history.length) return;
+  list.innerHTML = '';
+  history.slice(0, 6).forEach(item => {
+    const row = document.createElement('a');
+    row.href = "{{ url_for('report') }}";
+    row.className = 'recent-row';
+    const positive = item.cancer_status === 'Tumor Detected';
+    row.innerHTML = `
+      <span class="rr-dot ${positive ? 'pos' : 'neg'}"></span>
+      <div class="rr-main">
+        <span class="rr-title">${item.cancer_status}</span>
+        <span class="rr-sub">${item.timestamp} &middot; Burden ${item.tumor_burden_pct}%</span>
+      </div>
+      <i class="bi bi-chevron-right" style="color:var(--ink-soft);"></i>
+    `;
+    list.appendChild(row);
+  });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "_app_base.html" %}
+{% block title %}About — HepaVision{% endblock %}
+{% block content %}
+
+<header class="topbar">
+  <div>
+    <h1 class="topbar-title">About HepaVision</h1>
+    <p class="topbar-sub">Project overview, methodology, and research objectives</p>
+  </div>
+</header>
+
+<div class="card glass about-hero">
+  <h2>Project Overview</h2>
+  <p>HepaVision is a Computer-Aided Diagnosis (CAD) research prototype for automated liver tumor detection from abdominal CT images. It combines classical image processing with two cascaded deep learning models to segment the liver, localize tumor regions, and quantify tumor burden.</p>
+
+  <div class="about-grid">
+    <div class="about-item"><span class="about-k">Liver Model</span><span class="about-v mono">liver_unet.keras</span></div>
+    <div class="about-item"><span class="about-k">Tumor Model</span><span class="about-v mono">tumor_unet.keras</span></div>
+    <div class="about-item"><span class="about-k">Framework</span><span class="about-v mono">TensorFlow / Keras + OpenCV</span></div>
+    <div class="about-item"><span class="about-k">Backend</span><span class="about-v mono">Flask</span></div>
+  </div>
+
+  <div class="report-section-title">Problem Statement</div>
+  <p>Manual review of liver CT slices for tumor identification is time-consuming and subject to inter-observer variability. HepaVision explores whether a two-stage segmentation pipeline can consistently isolate the liver and flag candidate tumor regions to support downstream review.</p>
+
+  <div class="report-section-title">Research Motivation</div>
+  <p>Liver cancer remains a significant global health burden, and CT is a primary imaging modality for its evaluation. Automating segmentation and quantitative measurement can reduce analysis time and provide a consistent, reproducible starting point for further clinical review.</p>
+
+  <div class="report-section-title">Methodology</div>
+  <ul class="about-list">
+    <li><i class="bi bi-check-circle"></i> Stage 1 — Liver U-Net segments hepatic tissue from the full CT slice.</li>
+    <li><i class="bi bi-check-circle"></i> Stage 2 — Tumor U-Net detects lesion regions, constrained to the predicted liver mask.</li>
+    <li><i class="bi bi-check-circle"></i> Post-processing — connected-component analysis counts discrete lesions and filters noise.</li>
+    <li><i class="bi bi-check-circle"></i> Quantification — tumor burden is computed as the ratio of tumor pixels to liver pixels.</li>
+  </ul>
+
+  <div class="report-section-title">Deep Learning Approach</div>
+  <p>Both models use a U-Net encoder-decoder architecture with skip connections, well suited to biomedical image segmentation tasks where precise localization matters as much as classification.</p>
+
+  <div class="report-section-title">Image Processing Pipeline</div>
+  <p>Uploaded CT slices are decoded, resized to match each model's expected input resolution, and normalized before inference. Predicted masks are resized back to the original resolution using nearest-neighbor interpolation to preserve boundary sharpness for overlay visualization.</p>
+
+  <div class="report-section-title">Technologies Used</div>
+  <div class="tech-badges">
+    <span class="tech-badge">TensorFlow / Keras</span>
+    <span class="tech-badge">OpenCV</span>
+    <span class="tech-badge">Flask</span>
+    <span class="tech-badge">ReportLab (PDF)</span>
+    <span class="tech-badge">NumPy</span>
+  </div>
+
+  <div class="report-section-title">Research Objectives</div>
+  <ul class="about-list">
+    <li><i class="bi bi-check-circle"></i> Deliver reproducible, pixel-level liver and tumor segmentation from a single CT slice.</li>
+    <li><i class="bi bi-check-circle"></i> Provide interpretable quantitative outputs (burden, pixel counts, lesion count).</li>
+    <li><i class="bi bi-check-circle"></i> Package results into a shareable, structured PDF report.</li>
+  </ul>
+
+  <div class="report-section-title">Future Scope</div>
+  <p>Planned directions include volumetric (3D) segmentation across full CT series, multi-institution validation datasets, and calibrated uncertainty estimates alongside each prediction.</p>
+
+  <div class="disclaimer-box">
+    <i class="bi bi-exclamation-triangle"></i>
+    <p>This tool is a research and educational prototype. It is not a certified medical device and must not be used for real clinical diagnosis or treatment decisions.</p>
+  </div>
+</div>
+
+{% endblock %}

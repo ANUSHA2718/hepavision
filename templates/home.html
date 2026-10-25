@@ -1,0 +1,158 @@
+{% extends "_public_base.html" %}
+{% block title %}HepaVision — Intelligent Liver Tumor Detection{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="hero-copy fade-in">
+    <div class="hero-eyebrow">
+      <span class="badge-pill"><i class="bi bi-mortarboard"></i> Research &amp; Educational Prototype</span>
+    </div>
+    <h1>HepaVision: Intelligent <span class="accent">Liver Tumor Detection</span> from CT Images using Deep Learning and Image Processing</h1>
+    <p class="lede">HepaVision is an AI-powered Computer-Aided Diagnosis framework developed for automated liver tumor detection, liver segmentation, tumor segmentation, and quantitative CT image analysis using Deep Learning and Image Processing.</p>
+
+    <div class="hero-badges tech-badges">
+      <span class="tech-badge">Deep Learning</span>
+      <span class="tech-badge">Image Processing</span>
+      <span class="tech-badge">Medical AI</span>
+      <span class="tech-badge">CT Image Analysis</span>
+      <span class="tech-badge">TensorFlow</span>
+      <span class="tech-badge">Flask</span>
+    </div>
+
+    <div class="hero-actions">
+      <a href="{{ url_for('analysis') }}" class="btn btn-primary"><i class="bi bi-activity"></i> Analyze CT Scan</a>
+      <a href="{{ url_for('about') }}" class="btn btn-ghost">Learn More</a>
+    </div>
+
+    <div class="hero-authorline">
+      <i class="bi bi-shield-check"></i> Two-stage U-Net pipeline &middot; Liver Segmentation &rarr; Tumor Segmentation &middot; Research use only
+    </div>
+  </div>
+
+  <div class="pipeline-visual">
+    <div class="pipe-card glass c1">
+      <span class="pc-label"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i> Original CT</span>
+      <div class="pc-thumb">
+        <svg viewBox="0 0 200 108" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="108" fill="#0c2544"/>
+          <ellipse cx="100" cy="54" rx="70" ry="42" fill="none" stroke="#4c86e0" stroke-width="1.4" opacity=".7"/>
+          <ellipse cx="100" cy="54" rx="48" ry="28" fill="none" stroke="#22d3ee" stroke-width="1" opacity=".5"/>
+          <ellipse cx="100" cy="54" rx="26" ry="15" fill="none" stroke="#7fe6f5" stroke-width=".8" opacity=".4"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="pipe-card glass c2">
+      <span class="pc-label"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i> Liver Segmentation</span>
+      <div class="pc-thumb">
+        <svg viewBox="0 0 200 108" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="108" fill="#0c2544"/>
+          <path d="M45 70 C40 40 70 22 105 26 C140 30 158 50 152 74 C146 96 110 92 85 90 C62 88 49 88 45 70 Z" fill="#1d4fa8" opacity=".55" stroke="#4c86e0" stroke-width="1.4"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="pipe-card glass c3">
+      <span class="pc-label"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i> Tumor Segmentation</span>
+      <div class="pc-thumb">
+        <svg viewBox="0 0 200 108" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="108" fill="#0c2544"/>
+          <path d="M45 70 C40 40 70 22 105 26 C140 30 158 50 152 74 C146 96 110 92 85 90 C62 88 49 88 45 70 Z" fill="none" stroke="#4c86e0" stroke-width="1" opacity=".4"/>
+          <circle cx="112" cy="55" r="13" fill="#d64545" opacity=".75"/>
+          <circle cx="90" cy="70" r="6" fill="#d64545" opacity=".55"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="pipe-card glass c4">
+      <span class="pc-label"><i class="bi bi-circle-fill" style="color:#22d3ee; font-size:.4rem;"></i> Overlay Result</span>
+      <div class="pc-thumb">
+        <svg viewBox="0 0 200 108" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="108" fill="#0c2544"/>
+          <path d="M45 70 C40 40 70 22 105 26 C140 30 158 50 152 74 C146 96 110 92 85 90 C62 88 49 88 45 70 Z" fill="#1d4fa8" opacity=".4" stroke="#22d3ee" stroke-width="1.6"/>
+          <circle cx="112" cy="55" r="13" fill="#d64545" opacity=".85"/>
+          <circle cx="90" cy="70" r="6" fill="#d64545" opacity=".65"/>
+        </svg>
+      </div>
+    </div>
+
+    <svg class="pipe-arrow a1" width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="pipe-arrow a2" width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="pipe-arrow a3" width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+    <div class="hero-stat-chip glass">
+      <i class="bi bi-cpu" style="color:var(--medical-blue); font-size:1.2rem;"></i>
+      <div>
+        <span class="num">2</span>
+        <span class="lbl" style="display:block;">Cascaded U-Nets</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="section-head">
+    <span class="eyebrow">Capabilities</span>
+    <h2>A complete CT-to-report diagnostic pipeline</h2>
+    <p>Every stage of the workflow — from raw CT slice to a downloadable diagnostic report — runs on the trained TensorFlow models integrated into the Flask backend.</p>
+  </div>
+  <div class="feature-grid">
+    <div class="feature-card glass">
+      <div class="fi"><i class="bi bi-bounding-box-circles"></i></div>
+      <h3>Liver Segmentation</h3>
+      <p>U-Net based liver isolation from abdominal CT slices, delivering pixel-level hepatic boundaries.</p>
+    </div>
+    <div class="feature-card glass">
+      <div class="fi"><i class="bi bi-search-heart"></i></div>
+      <h3>Tumor Segmentation</h3>
+      <p>A second U-Net localizes lesion regions constrained within the predicted liver mask.</p>
+    </div>
+    <div class="feature-card glass">
+      <div class="fi"><i class="bi bi-graph-up"></i></div>
+      <h3>Quantitative Metrics</h3>
+      <p>Tumor burden, pixel counts, and lesion count computed directly from model outputs.</p>
+    </div>
+    <div class="feature-card glass">
+      <div class="fi"><i class="bi bi-file-earmark-pdf"></i></div>
+      <h3>Instant PDF Report</h3>
+      <p>A premium diagnostic report is generated automatically after every analysis.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="workflow">
+  <div class="section-head">
+    <span class="eyebrow">How it works</span>
+    <h2>From upload to diagnostic summary</h2>
+  </div>
+  <div class="workflow-strip">
+    <div class="workflow-step glass">
+      <span class="wf-index">01</span>
+      <h4>Upload CT Slice</h4>
+      <p>Drag &amp; drop a PNG, JPG, JPEG, BMP, or TIFF abdominal CT image.</p>
+    </div>
+    <div class="workflow-step glass">
+      <span class="wf-index">02</span>
+      <h4>Liver U-Net</h4>
+      <p>The liver model isolates hepatic tissue from the surrounding anatomy.</p>
+    </div>
+    <div class="workflow-step glass">
+      <span class="wf-index">03</span>
+      <h4>Tumor U-Net</h4>
+      <p>The tumor model detects lesion regions within the segmented liver.</p>
+    </div>
+    <div class="workflow-step glass">
+      <span class="wf-index">04</span>
+      <h4>Report Generation</h4>
+      <p>Overlay visualization and diagnostic metrics are compiled into a PDF.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band glass">
+  <h2>Run your first CT analysis</h2>
+  <p>Upload an abdominal CT slice and get liver segmentation, tumor segmentation, and quantitative results in seconds.</p>
+  <a href="{{ url_for('analysis') }}" class="btn btn-cyan"><i class="bi bi-activity"></i> Analyze CT Scan</a>
+</section>
+
+{% endblock %}
